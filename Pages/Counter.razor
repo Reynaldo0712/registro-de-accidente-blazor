@@ -1,0 +1,94 @@
+﻿@page "/counter"
+@using Tarea4.Data
+    <div class="bg-secondary">
+        <div class="container col-md-8">
+            <h3 class="text-center text-monospace text-white">Resgistrar Personas</h3><hr>
+            <form>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="Name">Nombre</label>
+                        <input @bind="name" id="Name" type="text" class="form-control" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="LastName">Apellido</label>
+                        <input @bind="LastName" id="LastName" type="text" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="Phone">Telefono</label>
+                        <input @bind="Phone" id="Phone" type="text" class="form-control" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="Cedula">Cedula</label>
+                        <input @bind="Cedula" id="Cedula" type="number" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-8">
+                        <label for="Email">Email</label>
+                        <input @bind="Email" id="Email" type="Email" class="form-control" required>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="Accidents">Accidente Involucrado</label>
+                        <select @bind="Accidents" id="Accidents" class="form-control" required>
+                            <option selected>Accidentes</option>
+                            @using (var accidents = new PersonContext())
+                            {
+                                foreach (var item in accidents.Accidents.ToList())
+                                {
+                                    <option value="@item.AccidentsId">@item.AccidentsId - @item.Place (@item.Date)</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <button @onclick="AddPersons" type="submit" class="btn btn-primary">Registrar</button>
+            </form><br>
+        </div>
+            @if (string.IsNullOrEmpty(error))
+            {
+
+            }
+            else
+            {
+                <div class="alert alert-danger text-center" role="alert">
+                    @error
+                </div>
+            }
+        </div>
+        @code {
+            string name;
+            string LastName;
+            string Phone;
+            string Cedula;
+            string Email;
+            int Accidents;
+
+            string error;
+            public void AddPersons()
+            {
+                if (Accidents == 0 || string.IsNullOrEmpty(name) || string.IsNullOrEmpty(LastName) || string.IsNullOrEmpty(Phone) || string.IsNullOrEmpty(Cedula) || string.IsNullOrEmpty(Email))
+                {
+                    error = "Debes llenar todos los campos";
+                }
+                else
+                {
+                    var db = new PersonContext();
+                    var persons = new Persons();
+
+                    persons.Name = name;
+                    persons.LastName = LastName;
+                    persons.Phone = Phone;
+                    persons.Cedula = Cedula;
+                    persons.Email = Email;
+                    persons.AccidentsId = Accidents;
+
+                    db.Add(persons);
+                    db.SaveChanges();
+                }
+            }
+        }

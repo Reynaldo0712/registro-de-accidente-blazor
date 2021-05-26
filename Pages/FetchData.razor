@@ -1,0 +1,110 @@
+﻿@page "/fetchdata"
+
+@using Tarea4.Data
+
+<div class="container" style="overflow:auto;"
+<h1 class="text-monospace text-capitalize">Accidentes Registrados</h1>
+        <div class="form-group col-md-4">
+                <label for="Accidents">Elegir accidente</label>
+                <select @bind="choose" id="Accidents" class="form-control">
+                    <option selected>Accidentes</option>
+                     @using (var accidents = new PersonContext()){
+                         foreach(var item in accidents.Accidents.ToList()){
+                             <option value="@item.AccidentsId">@item.AccidentsId - @item.Place (@item.Date)</option>
+                         }
+                     }
+                </select>
+            </div>
+    </div>
+        <div class="container" style="overflow:auto; height: 430px;">
+            @using (var db = new PersonContext())
+            {
+                @foreach (var item in db.Accidents.ToList())
+                {
+                    @if(choose == item.AccidentsId){
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                    <tr class="text-center">
+                        <th colspan="6">Accidentes</th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th>#</th>
+                        <th>Descripcion</th>
+                        <th>Fecha - Hora</th>
+                        <th>Lugar</th>
+                        <th>Longitud</th>
+                        <th>Lactitud</th>
+                        <th>Imagen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>@item.AccidentsId</th>
+                        <td>@item.Description</td>
+                        <td>@item.Date - @item.Time</td>
+                        <td>@item.Place</td>
+                        <td>@item.longitud</td>
+                        <td>@item.latitude</td>
+                        <td><img src=@string.Format("data:image/jpg;base64, {0}", Convert.ToBase64String(getImage(Convert.ToBase64String(item.Imagen)))) width="35" height="40" /></td>
+                    </tr>
+                </tbody>
+                @imgsrc
+                <thead class="thead-light">
+                    <tr class="text-center">
+                        <th colspan="6">Involucrados</th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Telefono</th>
+                        <th>Email</th>
+                        <th>Cedula</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                @foreach (var list in db.Persons.ToList())
+                {
+                    @if (item.AccidentsId == list.AccidentsId)
+                    {
+                        <tbody>
+                            <tr>
+                                <th>@list.PersonsId</th>
+                                <td>@list.Name</td>
+                                <td>@list.LastName</td>
+                                <td>@list.Phone</td>
+                                <td>@list.Email</td>
+                                <td>@list.Cedula</td>
+                                <th></th>
+                            </tr>
+                        </tbody>
+                    }
+                }
+            </table> <hr>
+                }
+            }
+        }
+        </div>
+
+@code{
+    int choose;
+
+
+    string imgsrc = "";
+     public byte[] getImage (string sBase64String)
+    {
+        byte[] bytes = null;
+        if (sBase64String != null)
+        {
+            bytes = Convert.FromBase64String(sBase64String);
+        }
+
+        return bytes;
+    }
+
+
+
+
+}

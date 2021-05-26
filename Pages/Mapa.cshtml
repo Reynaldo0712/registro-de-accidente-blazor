@@ -1,0 +1,79 @@
+﻿@page "/Mapa"
+@using Newtonsoft.Json;
+@namespace tarea4.Pages
+@using Tarea4.Data
+@{
+
+
+    var db = new PersonContext();
+    var json = JsonConvert.SerializeObject(db.Accidents.ToList());
+    var jsoni = JsonConvert.SerializeObject(db.Persons.ToList(), Formatting.Indented,
+    new JsonSerializerSettings()
+    {
+        ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+    }
+);
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="css\site.css">
+
+</head>
+<body>
+
+    <div class="mapa">
+
+        <input class="btn btn btn-success btn-lg" type="button" onclick="history.back()" name="volver" value="volver">
+        <center>
+            <h1 class="text-monospace text-white">Mapa de los accidentes</h1>
+    </div></center>
+    <div id="map">
+        <center>
+
+
+    </div>
+
+
+    <script>
+                        
+         
+       const opcion = {
+
+        center: [18.66, -69.80],
+        zoom: 10
+       }
+
+        let map = L.map('map', opcion)
+        let tileLayer = L.tileLayer('http://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png');
+        
+        map.addLayer(tileLayer);
+        var dato = @Html.Raw(json);
+        var datoi = @Html.Raw(jsoni);
+        for (let i of dato) {
+            for (let invo of datoi) {
+                if (i.AccidentsId == invo.AccidentsId) {
+                    L.marker([i.latitude, i.longitud]).addTo(map)
+                    .bindPopup('<strong>' + i.Place + '</strong><br>' + i.Description + '<br><strong>Fecha-hora:</strong> ' + i.Date +  
+                        '<br><strong>Nombre:</strong>' + invo.Name + ' ' + invo.LastName + '<br><strong> Cedula:</strong>' + invo.Cedula + '')
+                        .openPopup();
+                    
+                }
+            }
+        }
+
+
+         
+
+
+    </script>
+    </center>
+</body>
+</html>

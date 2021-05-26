@@ -1,0 +1,91 @@
+﻿@page "/"
+@using Tarea4.Data
+@using System.IO
+@using BlazorInputFile
+
+    <div class="bg-secondary">
+        <div class="container col-md-8">
+            <h3 class="text-center text-monospace text-white">Resgistrar Acidentes</h3><hr>
+            <form>
+                <div class="form-group">
+                    <label for="descript">Descripción</label>
+                    <input @bind="description" id="descript" type="text" class="form-control" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="Date">Fecha</label>
+                        <input @bind="date" id="Date" type="Date" class="form-control" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="Time">Hora</label>
+                        <input @bind="time" id="DateTime" type="Time" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="Place">Lugar</label>
+                    <input @bind="place" id="Place" type="text" class="form-control" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputCity">Latitud</label>
+                        <input @bind="latitud" type="text" class="form-control" id="inputCity" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="inputState">Longitud</label>
+                        <input @bind="longitud" type="text" class="form-control" id="inputState" required>
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    <label for="imagen">Imagen</label>
+                    <InputFile OnChange="HandleFileSelection" />
+                </div>
+                <button @onclick="AddaAcidents" type="submit" class="btn btn-primary">Registrar</button>
+            </form>
+        </div>
+    </div>
+@code {
+    string description;
+    string date;
+    string time;
+    string place;
+    string latitud;
+    string longitud;
+ 
+
+    IFileListEntry file = null;
+    public byte[] _fileBytes = null;
+    public int count = 0;
+
+    public async Task HandleFileSelection(IFileListEntry[] files)
+    {
+        if (files.Count() > 0)
+        {
+            file = files.FirstOrDefault();
+            using (var ms = new MemoryStream())
+            {
+                await file.Data.CopyToAsync(ms);
+                _fileBytes = ms.ToArray();
+            }
+        }
+    }
+
+    public void AddaAcidents()
+    {
+        var db = new PersonContext();
+        var accidents = new Accidents();
+        accidents.Description = description;
+        accidents.Date = date;
+        accidents.Time = time;
+        accidents.Place = place;
+        accidents.longitud = longitud;
+        accidents.latitude = latitud;
+        accidents.Imagen = _fileBytes;
+
+        db.Add(accidents);
+        db.SaveChanges();
+    }
+}
